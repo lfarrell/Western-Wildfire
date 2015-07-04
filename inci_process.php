@@ -20,7 +20,7 @@ $states = [
 $site_base = 'http://inciweb.nwcg.gov';
 $html = file_get_html($site_base);
 $fh = fopen('fires.csv', 'wb');
-fputcsv($fh, ['name', 'lat', 'lng']);
+fputcsv($fh, ['name','size', 'lat', 'lng', 'cause', 'date', 'fuels']);
 
 process_page($html, $states, $site_base, $fh);
 
@@ -45,21 +45,27 @@ function process_page($html, $states, $site_base, $fh = false) {
         $active = $fire->find('td', 4);
         $is_active = trim($active->plaintext);
 
+        $size = $fire->find('td', 5);
+        $fire_size = str_replace(',', '', trim($size->plaintext));
+
         $in_west = $fire->find('td', 3);
         preg_match('/(New.Mexico|^[A-Za-z]+)/', trim($in_west->plaintext), $matches);
         $state = trim($matches[0]);
 
-        if($is_active == 'Active' && in_array($state, $states)) {
+        if($is_active == 'Active' && $fire_size > 0 && in_array($state, $states)) {
             $data = [];
             $name = $fire->find('td a', 0);
             $full_name = trim($name->plaintext);
-            $full_record = $name->href;
 
-            $fire_records = file_get_html($site_base . $full_record);
-            echo $full_name . "\n";
             $data[] = $full_name;
+            $data[] = $fire_size;
+
+            $full_record = $name->href;
+            $fire_records = file_get_html($site_base . $full_record);
+
             $record = process_fire($fire_records, $data);
-            if($fh) {
+            if($fh && $record[2] != '') {
+                echo $record[0] . " added\n";
                 fputcsv($fh, $record);
             }
         }
@@ -69,15 +75,49 @@ function process_page($html, $states, $site_base, $fh = false) {
 function process_fire($html, $data) {
     $lat_lng = $html->find('#content div');
 
+    // pre-populate the rest of info as some fields might be missing
+    for($i=2; $i<7; $i++) {
+        $data[$i] = '';
+    }
+
     foreach($lat_lng as $coords) {
         $coordinates = $coords->plaintext;
         if(preg_match('/\d+\.\d+\slatitude.*?longitude/', $coordinates, $matches)) {
             $coordinate_parts = preg_split('/,/', $matches[0]);
             $lat = coordinate($coordinate_parts[0]);
             $lng = coordinate($coordinate_parts[1]);
-            $data[] = $lat;
-            $data[] = $lng;
-            echo $lat . ',' . $lng . "\n";
+            if(!$lat && !$lng) {
+                unset($data);
+                continue;
+            }
+            $data[2] = $lat;
+            $data[3] = $lng;
+        }
+    }
+
+    $details = $html->find('table.data');
+
+    foreach($details as $detail) {
+        $infos = $detail->find('tr');
+        foreach($infos as $info) {
+            $f = $info->find('.cell1', 0);
+            $field = trim($f->plaintext);
+
+            if($field == 'Cause') {
+                $cause = $info->find('.cell2', 0);
+                $fire_cause = trim($cause->plaintext);
+                $data[4] = $fire_cause;
+            } elseif($field == 'Date of Origin') {
+                $date = $info->find('.cell2', 0);
+                $fire_date = trim($date->plaintext);
+                $data[5] = $fire_date;
+            } elseif($field == 'Fuels Involved') {
+                $fuel = $info->find('.cell2', 0);
+                $fire_fuel = trim($fuel->plaintext);
+                $data[6] = $fire_fuel;
+            } else {
+                continue;
+            }
         }
     }
 

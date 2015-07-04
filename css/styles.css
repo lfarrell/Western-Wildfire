@@ -1,0 +1,50 @@
+body {
+    color: white;
+    background-color: #333;
+    font-family: 'Roboto', sans-serif;
+}
+
+h1, h2 {
+    margin-top: 70px;
+    text-align: center;
+}
+
+h3, #res_legend, #compare_legend, #map_legend, .center {
+    text-align: center;
+}
+
+
+.axis path,
+.axis line {
+    fill: none;
+    padding: 5px;
+    stroke: white;
+    shape-rendering: crispEdges;
+}
+
+#map path {
+    fill: none;
+    stroke: white;
+    stroke-width: 1;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: auto;
+    height: auto;
+    padding: 5px;
+    fill: black;
+    background: black;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+text {
+    fill: white;
+}
+
+a {
+    color: white;
+}
