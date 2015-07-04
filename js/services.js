@@ -49,7 +49,7 @@ angular.module('westernWildfire').service('tipService', function() {
 
         tip.html(text)
             .style("top", (d3.event.pageY-38)+"px")
-            .style("left", (d3.event.pageX-38)+"px");
+            .style("left", (d3.event.pageX+38)+"px");
 
     };
 
