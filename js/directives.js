@@ -83,6 +83,7 @@ angular.module('westernWildfire').directive('mapGraph', ['tipService', 'StatsSer
                 .style("fill", function(d) {
                     return "firebrick";//chartService.resColors(d.pct_capacity);
                 })
+                .style("stroke", "black")
                 .on("mouseover", function(d) {
                     var text =  d.name + "<br>" +
                         "Start Date: " + d.date + "<br>" +
