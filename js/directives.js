@@ -1,7 +1,7 @@
 angular.module('westernWildfire').directive('mapGraph', ['tipService', 'StatsService', 'chartService', function(tipService, StatsService, chartService) {
     function link(scope, element, attrs) {
         var margin = {top: 20, right: 20, left: 20, bottom: 20},
-            height = 2000 - margin.top - margin.bottom,
+            height = 750 - margin.top - margin.bottom,
             width = 1000 - margin.left - margin.right,
             tip = tipService.tipDiv();
 
