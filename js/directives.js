@@ -85,6 +85,9 @@ angular.module('westernWildfire').directive('mapGraph', ['tipService', 'StatsSer
                 })
                 .style("stroke", "black")
                 .on("mouseover", function(d) {
+                    if(!d.fuels) { d.fuels = 'Unknown'; }
+                    if(!d.cause) { d.cause = 'Unknown'; }
+
                     var text =  d.name + "<br>" +
                         "Start Date: " + d.date + "<br>" +
                         "Size: " + StatsService.numFormat(d.size) + " acres<br>" +

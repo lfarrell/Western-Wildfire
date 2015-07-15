@@ -99,7 +99,7 @@ angular.module('westernWildfire').service('chartService', function() {
 
         var keys, colors, width;
         if(is_map) {
-            keys = ['75%+', '50%+', 'Less than 50%  ', 'Current Level Unavailable'];
+            keys = ['75%+', '50%+', 'Less than 50%', 'Current Level Unavailable'];
             colors = ['green', '#FCE883', 'red', 'gray'];
             width = 450;
         } else {

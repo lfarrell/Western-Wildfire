@@ -76,7 +76,7 @@ function process_fire($html, $data) {
     $lat_lng = $html->find('#content div');
 
     // pre-populate the rest of info as some fields might be missing
-    for($i=2; $i<7; $i++) {
+    for($i=2; $i<8; $i++) {
         $data[$i] = '';
     }
 
@@ -115,6 +115,10 @@ function process_fire($html, $data) {
                 $fuel = $info->find('.cell2', 0);
                 $fire_fuel = trim($fuel->plaintext);
                 $data[6] = $fire_fuel;
+            } elseif($field == 'Total Personnel') {
+                $personnel = $info->find('.cell2', 0);
+                $total_personnel = trim($personnel->plaintext);
+                $data[7] = $total_personnel;
             } else {
                 continue;
             }
