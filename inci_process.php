@@ -20,7 +20,7 @@ $states = [
 $site_base = 'http://inciweb.nwcg.gov';
 $html = file_get_html($site_base);
 $fh = fopen('fires.csv', 'wb');
-fputcsv($fh, ['name','size', 'lat', 'lng', 'cause', 'date', 'fuels']);
+fputcsv($fh, ['name','size', 'lat', 'lng', 'cause', 'date', 'fuels', 'personnel', 'contained', 'location', 'events']);
 
 process_page($html, $states, $site_base, $fh);
 
@@ -76,7 +76,7 @@ function process_fire($html, $data) {
     $lat_lng = $html->find('#content div');
 
     // pre-populate the rest of info as some fields might be missing
-    for($i=2; $i<8; $i++) {
+    for($i=2; $i<10; $i++) {
         $data[$i] = '';
     }
 
@@ -86,7 +86,7 @@ function process_fire($html, $data) {
             $coordinate_parts = preg_split('/,/', $matches[0]);
             $lat = coordinate($coordinate_parts[0]);
             $lng = coordinate($coordinate_parts[1]);
-            if(!$lat && !$lng) {
+            if(!$lat || !$lng) {
                 unset($data);
                 continue;
             }
@@ -100,30 +100,43 @@ function process_fire($html, $data) {
     foreach($details as $detail) {
         $infos = $detail->find('tr');
         foreach($infos as $info) {
-            $f = $info->find('.cell1', 0);
+            $f = $info->find('th', 0);
             $field = trim($f->plaintext);
 
             if($field == 'Cause') {
-                $cause = $info->find('.cell2', 0);
+                $cause = $info->find('td', 0);
                 $fire_cause = trim($cause->plaintext);
                 $data[4] = $fire_cause;
             } elseif($field == 'Date of Origin') {
-                $date = $info->find('.cell2', 0);
+                $date = $info->find('td', 0);
                 $fire_date = trim($date->plaintext);
                 $data[5] = $fire_date;
             } elseif($field == 'Fuels Involved') {
-                $fuel = $info->find('.cell2', 0);
+                $fuel = $info->find('td', 0);
                 $fire_fuel = trim($fuel->plaintext);
                 $data[6] = $fire_fuel;
             } elseif($field == 'Total Personnel') {
-                $personnel = $info->find('.cell2', 0);
+                $personnel = $info->find('td', 0);
                 $total_personnel = trim($personnel->plaintext);
                 $data[7] = $total_personnel;
+            } elseif($field == 'Percent of Perimeter Contained') {
+                $contained = $info->find('td', 0);
+                $pct_contained = trim($contained->plaintext);
+                $data[8] = $pct_contained;
+            } elseif($field == 'Location') {
+                $location = $info->find('td', 0);
+                $total_location = trim($location->plaintext);
+                $data[9] = $total_location;
+            }elseif($field == 'Significant Events') {
+                $events = $info->find('td', 0);
+                $total_events = trim($events->plaintext);
+                $data[10] = $total_events;
             } else {
                 continue;
             }
         }
     }
+
 
     return $data;
 }
