@@ -1,36 +1,25 @@
 body {
-    color: white;
-    background-color: #333;
     font-family: 'Roboto', sans-serif;
+    color: #ffffff;
+    background-color: #333;
+}
+
+#map {
+    color: black;
+    height: 550px
+}
+
+#fire-info {
+    overflow-x: auto;
+    background-color: white;
+    border-left: 2px solid lightgray;
+    color: black;
+    height: 550px;
 }
 
 h1, h2 {
-    margin-top: 70px;
+    margin-top: 10px;
     text-align: center;
-}
-
-h3, #res_legend, #compare_legend, #map_legend, .center {
-    text-align: center;
-}
-
-.loader {
-    font-size: 3em;
-    margin-top:50px;
-    text-align: center;
-}
-
-.axis path,
-.axis line {
-    fill: none;
-    padding: 5px;
-    stroke: white;
-    shape-rendering: crispEdges;
-}
-
-#map path {
-    fill: none;
-    stroke: white;
-    stroke-width: 1;
 }
 
 div.tooltip {
@@ -46,10 +35,82 @@ div.tooltip {
     pointer-events: none;
 }
 
-text {
-    fill: white;
+.inner {
+    position: absolute;
+    background-color: black;
+    height: 300px;
+    width: 25%;
+    z-index: 99999;
+    right: 0;
+    top: 0;
 }
 
-a {
-    color: white;
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: auto;
+    height: auto;
+    padding: 5px;
+    fill: black;
+    background: black;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+/* styles from https://github.com/Caged/d3-tip/blob/master/examples/example-styles.css */
+.d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.8);
+    position: absolute;
+    pointer-events: none;
+}
+
+/* Northward tooltips */
+.d3-tip.n:after {
+    content: "\25BC";
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+    text-align: center;
+}
+
+/* Eastward tooltips */
+.d3-tip.e:after {
+    content: "\25C0";
+    margin: -4px 0 0 0;
+    top: 50%;
+    left: -8px;
+}
+
+/* Southward tooltips */
+.d3-tip.s:after {
+    content: "\25B2";
+    margin: 0 0 1px 0;
+    top: -8px;
+    left: 0;
+    text-align: center;
+}
+
+/* Westward tooltips */
+.d3-tip.w:after {
+    content: "\25B6";
+    margin: -4px 0 0 -1px;
+    top: 50%;
+    left: 100%;
 }
