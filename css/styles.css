@@ -9,10 +9,15 @@ body {
     height: 550px
 }
 
+#sub-map {
+    height: 220px;
+}
+
 #fire-info {
     overflow-x: auto;
     background-color: white;
     border-left: 2px solid lightgray;
+    border-bottom: 2px solid lightgray;
     color: black;
     height: 550px;
 }
