@@ -19,7 +19,7 @@ d3.csv('data/fires.csv', function(data) {
     var firesOverlay = L.d3SvgOverlay(function(sel,proj){
         var circle_size = d3.scale.linear().domain(d3.extent(data, function(d) {
             return d.size;
-        })).range([2, 10]).clamp(true);
+        })).range([2, 13]).clamp(true);
 
         var fire_map = sel.selectAll('circle').data(data);
 
@@ -44,7 +44,6 @@ d3.csv('data/fires.csv', function(data) {
             });
 
         var circles = document.querySelectorAll('.d3-overlay circle');
-      //  var circles = d3.selectAll('.d3-overlay circle')
 
         for(var i=0; i<circles.length; i++) {
             L.tooltip({
