@@ -17,6 +17,17 @@ body {
     height: 550px;
 }
 
+circle {
+    fill: firebrick;
+    stroke: black;
+    stroke-width: 1;
+    opacity: 0.5;
+}
+
+circle:hover {
+    cursor: pointer;
+}
+
 h1, h2 {
     margin-top: 10px;
     text-align: center;

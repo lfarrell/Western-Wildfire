@@ -21,42 +21,40 @@ d3.csv('data/fires.csv', function(data) {
             return d.size;
         })).range([2, 10]).clamp(true);
 
-        var tip = d3.tip()
-            .attr('class', 'd3-tip')
-            .html(function(d) { return '<span>' + d.name + '</span>'; });
-        console.log(tip)
-
         var fire_map = sel.selectAll('circle').data(data);
-
-        sel.call(tip);
 
         fire_map.enter()
             .append('circle')
             .attr('r',function(d){ return circle_size(d.size); })
             .attr('cx',function(d){return proj.latLngToLayerPoint(d.latLng).x; })
             .attr('cy',function(d){return proj.latLngToLayerPoint(d.latLng).y; })
-            .attr('stroke','black')
-            .attr('stroke-width',1)
-            .attr('fill', 'firebrick')
-            .style('opacity', '.5')
             .on('click', function(d) {
                 var full_record = record_to_show(d);
                 d3.select('#fire-data').html(full_record);
             })
             .on("mouseover", function(d) {
-                tip.show;
-
                 d3.select(this).attr('r', function(d) {
                     return circle_size(d.size) * 1.5;
-                }).style('cursor', 'pointer');
+                });
             })
             .on("mouseout", function(d) {
-                tip.hide;
-
                 d3.select(this).attr('r', function(d) {
                     return circle_size(d.size);
                 });
             });
+
+        var circles = document.querySelectorAll('.d3-overlay circle');
+      //  var circles = d3.selectAll('.d3-overlay circle')
+
+        for(var i=0; i<circles.length; i++) {
+            L.tooltip({
+                target: circles[i],
+                map: map,
+                html: data[i].name,
+                showDelay: 100,
+                hideDelay: 100
+            });
+        }
     });
 
     firesOverlay.addTo(map);
@@ -67,7 +65,8 @@ function numFormat(number) {
 };
 
 function record_to_show(d) {
-    d.location = (d.location !== '') ? d.location : "None Reported";
+    d.date = (d.date !== '') ? d.date : "Not Reported";
+    d.location = (d.location !== '') ? d.location : "Not Reported";
     d.contained = (d.contained !== '') ? d.contained : "Not Reported";
     d.personnel = (d.personnel !== '') ? d.personnel: "Not Reported";
     d.cause = (d.cause !== '') ? d.cause : "Not Reported";
