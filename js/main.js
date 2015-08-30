@@ -14,6 +14,8 @@ d3.csv('data/fires.csv', function(data) {
         d.latLng = [+d.lat,+d.lng];
     });
 
+    d3.select('#fire-data').html(record_to_show(data[0]));
+
     var firesOverlay = L.d3SvgOverlay(function(sel,proj){
         var circle_size = d3.scale.linear().domain(d3.extent(data, function(d) {
             return d.size;
@@ -38,22 +40,7 @@ d3.csv('data/fires.csv', function(data) {
             .attr('fill', 'firebrick')
             .style('opacity', '.5')
             .on('click', function(d) {
-                d.location = (d.location !== '') ? d.location : "None Reported";
-                d.events = (d.events !== '') ? d.events : "None Reported";
-                d.contained = (d.contained !== '') ? d.contained : "Not Reported";
-
-                var full_record = '<h2>' + d.name + '</h2>';
-
-                full_record += '<ul class="list-unstyled">' +
-                    '<li><strong>Start Date:</strong> ' + d.date +'</li>' +
-                    '<li><strong>Location:</strong> ' + d.location +'</li>' +
-                    '<li><strong>Acres Burned:</strong> ' + numFormat(d.size) +'</li>' +
-                    '<li><strong>Pct. Contained:</strong> ' + d.contained +'</li>' +
-                    '<li><strong>Total Personnel:</strong> ' + d.personnel +'</li>' +
-                    '<li><strong>Cause:</strong> ' + d.cause +'</li>' +
-                    '<li><strong>Fuels:</strong> ' + d.fuels +'</li>' +
-                    '<li><strong>Events:</strong> ' + d.events +'</li>'
-                '</ul>'
+                var full_record = record_to_show(d);
                 d3.select('#fire-data').html(full_record);
             })
             .on("mouseover", function(d) {
@@ -78,3 +65,29 @@ d3.csv('data/fires.csv', function(data) {
 function numFormat(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
+
+function record_to_show(d) {
+    d.location = (d.location !== '') ? d.location : "None Reported";
+    d.contained = (d.contained !== '') ? d.contained : "Not Reported";
+    d.personnel = (d.personnel !== '') ? d.personnel: "Not Reported";
+    d.cause = (d.cause !== '') ? d.cause : "Not Reported";
+    d.events = (d.events !== '') ? d.events : "None Reported";
+    d.weather = (d.weather !== '') ? d.weather : "Not Reported";
+
+    var full_record = '<h2>' + d.name + '</h2>';
+
+    full_record += '<ul class="list-unstyled">' +
+        '<li><strong>Start Date:</strong> ' + d.date +'</li>' +
+        '<li><strong>Location:</strong> ' + d.location +'</li>' +
+        '<li><strong>Acres Burned:</strong> ' + numFormat(d.size) +'</li>' +
+        '<li><strong>Pct. Contained:</strong> ' + d.contained +'</li>' +
+        '<li><strong>Total Personnel:</strong> ' + d.personnel +'</li>' +
+        '<li><strong>Cause:</strong> ' + d.cause +'</li>' +
+        '<li><strong>Fuels:</strong> ' + d.fuels +'</li>' +
+        '<li><strong>Events:</strong> ' + d.events +'</li>' +
+        '<li><strong>Weather:</strong> ' + d.weather +'</li>' +
+        '<li><a target="_blank" href="' + d.link +'">More Information</a></li>'
+    '</ul>';
+
+    return full_record;
+}
