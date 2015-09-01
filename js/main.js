@@ -1,13 +1,25 @@
 d3.csv('data/fires.csv', function(data) {
-    var map = L.map('map').setView([40.8, -120.82082], 5);
+    var screen_height = document.documentElement.clientHeight;
 
-    var map_tiles = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+    if(screen_height >= 550) {
+        d3.selectAll('#map, #fire-info').style('height', screen_height);
+    }
+
+    /*
+     * Load main map
+     */
+    var map = L.map('map');
+
+    map.setView([40.8, -120.82082], 5);
+
+    L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
         maxZoom: 18
-    });
+    }).addTo(map);
 
-    map_tiles.addTo(map);
-
+    /*
+     * Process data for adding circles
+     */
     data.sort(function(a,b) {
         return b.size - a.size;
     });
@@ -16,8 +28,23 @@ d3.csv('data/fires.csv', function(data) {
         d.latLng = [+d.lat,+d.lng];
     });
 
+
     /*
-    * Show all markers on main map
+     * Add initial record & sub-map to show
+     */
+    d3.select('#fire-data').html(record_to_show(data[0]));
+    var sub_map = L.map('sub-map').setView([data[0].lat, data[0].lng], 8);
+
+    L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+        maxZoom: 18
+    }).addTo(sub_map);
+
+    var marker = L.marker([data[0].lat, data[0].lng]).addTo(sub_map);
+    marker.bindPopup(data[0].name).openPopup();
+
+    /*
+     * Show all markers on main map
      */
     var firesOverlay = L.d3SvgOverlay(function(sel,proj){
         var circle_size = d3.scale.linear().domain(d3.extent(data, function(d) {
@@ -62,20 +89,6 @@ d3.csv('data/fires.csv', function(data) {
                 hideDelay: 100
             });
         }
-
-        /*
-         * Add initial record & sub-map to show
-         */
-        d3.select('#fire-data').html(record_to_show(data[0]));
-        var sub_map = L.map('sub-map').setView([data[0].lat, data[0].lng], 8);
-
-        L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
-            maxZoom: 18
-        }).addTo(sub_map);
-
-        var marker = L.marker([data[0].lat, data[0].lng]).addTo(sub_map);
-        marker.bindPopup(data[0].name).openPopup();
     });
 
     firesOverlay.addTo(map);
