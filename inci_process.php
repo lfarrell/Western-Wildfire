@@ -14,15 +14,9 @@ $unique_links = range(10, 250, 10);
 foreach($unique_links as $unique_link) {
     $full_link = $site_base . '/' . $unique_link . '/';
 
-    if(url_exists($full_link)) {
-        if($html = file_get_html($full_link)) {
-            process_page($html, $site_base, $fh);
-        } else {
-            echo "Error processing $full_link\n";
-            exit;
-        }
-    } else {
-        break;
+
+    if($html = file_get_html($full_link)) {
+        process_page($html, $site_base, $fh);
     }
 }
 fclose($fh);
@@ -69,13 +63,8 @@ function process_page($html, $site_base, $fh = false) {
 
             $full_record = $name->href;
             $full_link = $site_base . $full_record;
-         //   $fire_records = file_get_html($full_link);
-            if($fire_records = file_get_html($full_link)) {
-                $record = process_fire($fire_records, $data, $full_link);
-            } else {
-                echo "Error processing $full_link\n";
-                exit;
-            }
+            $fire_records = file_get_html($full_link);
+            $record = process_fire($fire_records, $data, $full_link);
 
             if($fh && $record[2] != '' && !in_array($full_name, $fire_names)) {
                 echo $record[0] . " added\n";
