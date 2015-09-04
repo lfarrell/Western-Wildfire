@@ -5,7 +5,7 @@ include 'simple_html_dom.php';
 $site_base = 'http://inciweb.nwcg.gov';
 $html = file_get_html($site_base);
 $fh = fopen('fires.csv', 'wb');
-fputcsv($fh, ['name','size', 'lat', 'lng', 'cause', 'date', 'fuels', 'personnel', 'contained', 'location', 'events', 'weather', 'link']);
+fputcsv($fh, array('name','size', 'lat', 'lng', 'cause', 'date', 'fuels', 'personnel', 'contained', 'location', 'events', 'weather', 'link'));
 
 process_page($html, $site_base, $fh);
 
@@ -24,7 +24,7 @@ fclose($fh);
 copy('fires.csv', 'data/fires.csv');
 
 function process_page($html, $site_base, $fh = false) {
-    $states = [
+    $states = array(
         'Alaska',
         'Arizona',
         'California',
@@ -37,9 +37,9 @@ function process_page($html, $site_base, $fh = false) {
         'Utah',
         'Washington',
         'Wyoming'
-    ];
+    );
 
-    $fire_names = [];
+    $fire_names = array();
     $fires = $html->find('tr');
 
     foreach($fires as $fire) {
@@ -54,7 +54,7 @@ function process_page($html, $site_base, $fh = false) {
         $state = trim($matches[0]);
 
         if($is_active == 'Active' && $fire_size > 0 && in_array($state, $states)) { //
-            $data = [];
+            $data = array();
             $name = $fire->find('td a', 0);
             $full_name = trim($name->plaintext);
 
