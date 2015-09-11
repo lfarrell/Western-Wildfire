@@ -1,5 +1,5 @@
 <?php
-date_default_timezone_set('America/New_York');
+//date_default_timezone_set('America/New_York');
 include 'simple_html_dom.php';
 
 $site_base = 'http://inciweb.nwcg.gov';
@@ -21,7 +21,12 @@ foreach($unique_links as $unique_link) {
 }
 fclose($fh);
 
-copy('fires.csv', 'data/fires.csv');
+if(copy('fires.csv', 'data/fires.csv')) {
+    echo "Fires Updated\n";
+} else {
+    echo "Fires Could Not be Updated\n";
+}
+
 
 function process_page($html, $site_base, $fh = false) {
     $states = array(
@@ -67,7 +72,7 @@ function process_page($html, $site_base, $fh = false) {
             $record = process_fire($fire_records, $data, $full_link);
 
             if($fh && $record[2] != '' && !in_array($full_name, $fire_names)) {
-                echo $record[0] . " added\n";
+              //  echo $record[0] . " added\n";
                 fputcsv($fh, $record);
 
                 $fire_names[] = $full_name . ', ' . $state;
