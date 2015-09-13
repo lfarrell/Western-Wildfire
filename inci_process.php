@@ -70,14 +70,18 @@ function process_page($html, $site_base, $fh = false) {
 
             $full_record = $name->href;
             $full_link = $site_base . $full_record;
-            $fire_records = file_get_html($full_link);
-            $record = process_fire($fire_records, $data, $full_link);
+            if(url_exists($full_link)) {
+                $fire_records = file_get_html($full_link);
+                $record = process_fire($fire_records, $data, $full_link);
 
-            if($fh && $record[2] != '' && !in_array($full_name, $fire_names)) {
-              //  echo $record[0] . " added\n";
-                fputcsv($fh, $record);
+                if($fh && $record[2] != '' && !in_array($full_name, $fire_names)) {
+                  //  echo $record[0] . " added\n";
+                    fputcsv($fh, $record);
 
-                $fire_names[] = $full_name . ', ' . $state;
+                    $fire_names[] = $full_name . ', ' . $state;
+                }
+            } else {
+                continue;
             }
         }
     }
