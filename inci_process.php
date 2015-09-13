@@ -15,8 +15,10 @@ foreach($unique_links as $unique_link) {
     $full_link = $site_base . '/' . $unique_link . '/';
 
 
-    if($html = file_get_html($full_link)) {
+    if(url_exists($full_link) && $html = file_get_html($full_link)) {
         process_page($html, $site_base, $fh);
+    } else {
+        continue;
     }
 }
 fclose($fh);
