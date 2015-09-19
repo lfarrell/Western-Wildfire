@@ -1,4 +1,11 @@
-d3.csv('data/fires.csv', function(data) {
+/**
+ *  Load  map
+ */
+queue().defer(d3.csv,'data/fires.csv')
+    .defer(d3.csv,'data/cal_fire.csv')
+    .await(function(error, inci_web, cal_fire) {
+//d3.csv('data/fires.csv', function(data) {
+    var data = inci_web.concat(cal_fire);
     var screen_height = document.documentElement.clientHeight;
 
     if(screen_height >= 550) {
@@ -49,7 +56,7 @@ d3.csv('data/fires.csv', function(data) {
     var firesOverlay = L.d3SvgOverlay(function(sel,proj){
         var circle_size = d3.scale.linear().domain(d3.extent(data, function(d) {
             return d.size;
-        })).range([2, 13]).clamp(true);
+        })).range([3, 15]).clamp(true);
 
         var fire_map = sel.selectAll('circle').data(data);
 
@@ -96,7 +103,7 @@ d3.csv('data/fires.csv', function(data) {
 
 function numFormat(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
+}
 
 function record_to_show(d) {
     d.date = (d.date !== '') ? d.date : "Not Reported";
@@ -104,6 +111,7 @@ function record_to_show(d) {
     d.contained = (d.contained !== '') ? d.contained : "Not Reported";
     d.personnel = (d.personnel !== '') ? d.personnel: "Not Reported";
     d.cause = (d.cause !== '') ? d.cause : "Not Reported";
+    d.fuels = (d.fuels !== '') ? d.fuels : "Not Reported";
     d.events = (d.events !== '') ? d.events : "None Reported";
     d.weather = (d.weather !== '') ? d.weather : "Not Reported";
 
