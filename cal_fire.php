@@ -5,16 +5,17 @@ $base_link = "http://cdfdata.fire.ca.gov/incidents/incidents_current";
 $base_link_next = "http://cdfdata.fire.ca.gov/incidents/incidents_current?pc=50&cp=";
 $map_base = "http://cdfdata.fire.ca.gov/incidents/incidents_details_maps?incident_id=";
 $fh = fopen('cal_fire.csv', 'wb');
+fputcsv($fh, array('name','size', 'lat', 'lng', 'cause', 'date', 'fuels', 'personnel', 'contained', 'location', 'events', 'weather', 'link'));
+
+$data = array();
+// pre-populate the rest of info as some fields might be missing
+for($i=0; $i<12; $i++) {
+    $data[$i] = '';
+}
 
 for($i=0; $i<29; $i++) {
     $html = file_get_html($base_link_next . $i);
     $fire_links = $html->find('.header_td a');
-
-    $data = array();
-    // pre-populate the rest of info as some fields might be missing
-    for($i=0; $i<12; $i++) {
-        $data[$i] = '';
-    }
 
     foreach($fire_links as $fire_link) {
         $full_record = 'http://cdfdata.fire.ca.gov' . $fire_link->href;
@@ -30,25 +31,34 @@ for($i=0; $i<29; $i++) {
 
             $j = 0;
             foreach($rows as $row) {
-               // if($j == 0) continue;
-
                 $f = $row->find('td', 0);
                 $field_name = clean($f->plaintext);
 
                 if($field_name == 'Last Updated:') {
                     $l = $row->find('td', 2);
-                    if(preg_match('/final/', $l->plaintext)) break;
-                } elseif($field == 'Long/Lat:') {
+                    if(preg_match('/final/', strtolower($l->plaintext))) {
+                        $data[13] = 'final';
+                    }
+                } elseif($field_name == 'Long/Lat:') {
                     $ll = $row->find('td', 1);
                     $lat_long = clean($ll->plaintext);
 
-                    $latitude_longitude = preg_split('/,/', $lat_lng);
+                    $latitude_longitude = preg_split('/(\/|,)/', $lat_long);
 
-                    $lat = clean($latitude_longitude[1]);
-                    $lng = clean($latitude_longitude[0]);
+                    if(preg_match('/^-/', clean($latitude_longitude[0]))) {
+                        $lat = clean($latitude_longitude[0]);
+                        $lng = clean($latitude_longitude[1]);
+                    } else {
+                        $lat = clean($latitude_longitude[1]);
+                        $lng = clean($latitude_longitude[0]);
+                    }
 
                     $data[2] = $lat;
                     $data[3] = $lng;
+                } elseif($field_name == 'County:') {
+                    $ct = $row->find('td', 1);
+                    $county = clean($ct->plaintext);
+                    $data[9] = $county;
                 } elseif($field_name == 'Cause:') {
                     $c = $row->find('td', 1);
                     $cause = clean($c->plaintext);
@@ -66,54 +76,69 @@ for($i=0; $i<29; $i++) {
                     $vals = clean($c->plaintext);
 
                     $fields = preg_split('/-/', $vals);
+                    $acres = str_replace('acres', '', $fields[0]);
 
-                    $fire_size = clean($fields[0]);
-                    $data[1] = $fire_size;
+                    $fire_size = clean($acres);
+                    $data[1] = clean_num($fire_size);
                     $contained = preg_split('/\s+/', clean($fields[1]))[0];
                     $data[8] = $contained;
-                } elseif($field == 'Evacuations:') {
+                } elseif($field_name == 'Injuries:') {
                     $e = $row->find('td', 1);
                     $events = clean($e->plaintext);
-                    $data[10] = $events;
-                } elseif($field == 'Conditions:') {
-                    $w = $row->find('td', 1);
-                    $weather = clean($w->plaintext);
-                    $data[11] = $weather;
+                    $data[10] .= "Injuries: $events<br />";
+                } elseif($field_name == 'Structures Destroyed:') {
+                    $d = $row->find('td', 1);
+                    $destroyed = clean($d->plaintext);
+                    $data[10] .= "Structures Destroyed: $destroyed<br />";
+                } elseif($field_name == 'Structures Threatened:') {
+                    $t = $row->find('td', 1);
+                    $threatened = clean($t->plaintext);
+                    $data[10] .= "Structures Threatened: $threatened<br />";
+             //   } elseif($field_name == 'Conditions:') {
+              //      $w = $row->find('td', 1);
+             //       $weather = clean($w->plaintext);
+             //       $data[11] = $weather;
                 }
 
                 $j++;
             }
+        }
 
-            if($data[2] == '') {
-                $lat_lng = file_get_html($map_base . $incident_id);
-                $links = $lat_lng->find('.incident_table');
+        if($data[2] == '') {
+            $lat_lng = file_get_html($map_base . $incident_id);
+            $links = $lat_lng->find('.incident_table');
 
-                foreach($links as $link) {
-                    $maps = $link->find('tr');
+            foreach($links as $link) {
+                $maps = $link->find('tr');
 
-                    foreach($maps as $map) {
-                        $map_urls = $map->find('td');
+                foreach($maps as $map) {
+                    $map_urls = $map->find('td a');
 
-                        foreach($map_urls as $url) {
-                            $link = clean($url->href);
-                            if(preg_match('/,/', $link, $matches)) {
-                                $values = preg_split('/,/', $matches[0]);
-                                $lat = preg_split('/@/', $values[0])[1];
-                                $lng = $values[1];
+                    foreach($map_urls as $url) {
+                        $link = clean($url->href);
+                        if(preg_match('/,/', $link)) {
+                            $values = preg_split('/,/', $link);
+                            $lat = preg_split('/@/', $values[0])[1];
+                            $lng = $values[1];
 
-                                $data[2] = $lat;
-                                $data[3] = $lng;
-                            }
+                            $data[2] = $lat;
+                            $data[3] = $lng;
                         }
                     }
                 }
             }
-
-
         }
 
-        fputcsv($fh, $data);
-        echo $fire_name . "\n";
+        if(!isset($data[13])) {
+            $data[12] = $full_record;
+            fputcsv($fh, $data);
+            echo $fire_name . "\n";
+        } else {
+            exit;
+         //   echo $fire_name . '-' . $data[13] . "\n";
+        }
+
+        $data[10] = '';
     }
 }
 
@@ -121,4 +146,8 @@ function clean($value) {
     $clean = strip_tags(trim($value));
 
     return preg_replace('/(\s+&nbsp;|&nbsp;)/', '', $clean);
+}
+
+function clean_num($value) {
+    return str_replace(',', '', $value);
 }
