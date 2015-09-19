@@ -1,10 +1,7 @@
 /**
  *  Load  map
  */
-queue().defer(d3.csv,'data/fires.csv')
-    .defer(d3.csv,'data/cal_fire.csv')
-    .await(function(error, inci_web, cal_fire) {
-//d3.csv('data/fires.csv', function(data) {
+d3.csv('data/fires.csv', function(data) {
     var data = inci_web.concat(cal_fire);
     var screen_height = document.documentElement.clientHeight;
 
