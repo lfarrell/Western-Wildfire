@@ -13,7 +13,7 @@ $state_list = array(
     'WA' => 45,
     'WY' => 48
 );
-/*
+
 foreach($state_list as $state => $number) {
     $links = [
         'temp' => "http://www.ncdc.noaa.gov/cag/time-series/us/$number/00/tavg/ytd/12/2002-2014.csv?base_prd=true&firstbaseyear=1925&lastbaseyear=2000",
@@ -55,7 +55,7 @@ foreach($files as $file) {
         }
         fclose($fh);
     }
-} */
+}
 
 $clean_files_rain = scandir('data/cleaned_weather/rain');
 $clean_files_temp = scandir('data/cleaned_weather/temp');

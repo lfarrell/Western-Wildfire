@@ -45,7 +45,7 @@ for($i=0; $i<29; $i++) {
 
                     $latitude_longitude = preg_split('/(\/|,)/', $lat_long);
 
-                    if(preg_match('/^-/', clean($latitude_longitude[0]))) {
+                    if(!preg_match('/^-/', clean($latitude_longitude[0]))) {
                         $lat = clean($latitude_longitude[0]);
                         $lng = clean($latitude_longitude[1]);
                     } else {
@@ -134,11 +134,14 @@ for($i=0; $i<29; $i++) {
             fputcsv($fh, $data);
             echo $fire_name . "\n";
         } else {
+            if(copy('cal_fire.csv', 'data/cal_fire.csv')) {
+                echo "Cal Fires Updated\n";
+            } else {
+                echo "Cal Fires Could Not be Updated\n";
+            }
             exit;
          //   echo $fire_name . '-' . $data[13] . "\n";
         }
-
-        $data[10] = '';
     }
 }
 

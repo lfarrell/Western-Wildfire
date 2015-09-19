@@ -39,8 +39,9 @@ function process_page($html, $site_base, $fh = false) {
         'Idaho',
         'Montana',
         'New Mexico',
+        'Nevada',
         'Oregon',
-        'Texas',
+    //    'Texas',
         'Utah',
         'Washington',
         'Wyoming'
