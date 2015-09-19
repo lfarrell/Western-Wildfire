@@ -2,7 +2,7 @@
  *  Load  map
  */
 d3.csv('data/fires.csv', function(data) {
-    var data = inci_web.concat(cal_fire);
+ //   var data = inci_web.concat(cal_fire);
     var screen_height = document.documentElement.clientHeight;
 
     if(screen_height >= 550) {
