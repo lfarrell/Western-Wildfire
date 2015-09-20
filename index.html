@@ -26,16 +26,104 @@
             <div class="col-md-12" id="sub-map"></div>
         </div>
     </div>
-
+    <div class="col-md-12"><h2>Historic Wildfires 2002-2014</h2></div>
+    <div class="row">
+            <div class="col-md-offset-1 col-md-4 btn-group" role="group" aria-label="Fire Options">
+                <button id="num" type="button" class="btn btn-default"># of Fires</button>
+                <button id="acres" type="button" class="btn btn-default">Acres Burned</button>
+                <button id="avg" type="button" class="btn btn-default">Avg. Acres Burned</button>
+            </div>
+            <div class="col-md-4 btn-group" role="group" aria-label="Temperature Options">
+                <button id="temp" type="button" class="btn btn-default">Avg. Temperature</button>
+                <button id="temp_anom" type="button" class="btn btn-default">Temp Anomaly</button>
+            </div>
+            <div class="col-md-3 btn-group" role="group" aria-label="Precipitation Options">
+                <button id="rain" type="button" class="btn btn-default">Rainfall</button>
+                <button id="rain_anom" type="button" class="btn btn-default">Rainfall Anomaly</button>
+            </div>
+    </div>
+    <div class="row">
+        <h3>Alaska</h3>
+        <div id="ak_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="ak_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="ak_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>Arizona</h3>
+        <div id="az_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="az_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="az_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>California</h3>
+        <div id="ca_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="ca_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="ca_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>Colorado</h3>
+        <div id="co_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="co_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="co_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>Idaho</h3>
+        <div id="id_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="id_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="id_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>Montana</h3>
+        <div id="mt_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="mt_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="mt_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>Nevada</h3>
+        <div id="nv_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="nv_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="nv_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>New Mexico</h3>
+        <div id="nm_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="nm_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="nm_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>Oregon</h3>
+        <div id="or_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="or_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="or_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>Utah</h3>
+        <div id="ut_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="ut_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="ut_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>Washington</h3>
+        <div id="wa_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="wa_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="wa_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
+    <div class="row">
+        <h3>Wyoming</h3>
+        <div id="wy_0" class="fire col-md-4"><h4>Fires</h4></div>
+        <div id="wy_1" class="temp col-md-4"><h4>Temperature</h4></div>
+        <div id="wy_2" class="precip col-md-4"><h4>Precipitation</h4></div>
+    </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
 <script src="js/Leaflet.D3SvgOverlay/L.D3SvgOverlay.min.js"></script>
 <script src="js/Leaflet.tooltip/leaflet.tooltip.js"></script>
 <script src="js/main.js"></script>
+<script src="js/historic.js"></script>
 <script type="text/javascript">
-     var _gaq = _gaq || [];
+ /*    var _gaq = _gaq || [];
      _gaq.push(['_setAccount', 'UA-47256145-1']);
      _gaq.push(['_trackPageview']);
 
@@ -43,6 +131,6 @@
      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-     })();
+     })(); */
 </script>
 </body>
