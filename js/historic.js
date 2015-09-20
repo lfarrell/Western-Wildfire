@@ -2,7 +2,7 @@
  * Load historic graphs
  */
 d3.csv('data/full_data_all.csv', function(data) {
-    var margin = {top: 20, right: 25, left: 75, bottom: 50},
+    var margin = {top: 20, right: 25, left: 70, bottom: 50},
         height = 375 - margin.top - margin.bottom,
         svg_width = document.getElementById("ak_0"),
         format = d3.time.format("%Y").parse,
@@ -34,7 +34,13 @@ d3.csv('data/full_data_all.csv', function(data) {
                 }));
 
                 var yScale = d3.scale.linear().range([0, height]);
-                yScale.domain([d3.max(filtered, function(d) { return d.fires; }), 0]);
+                yScale.domain([d3.max(filtered, function(d) { return d[graph_type(j)]; }), 0]);
+
+
+                var field = graph_type(i);
+                var graph_line =  d3.svg.line()
+                        .x(function(d) { return xScale(d.year); })
+                        .y(function(d) { return yScale(d[field]); });
 
                 var xAxis = d3.svg.axis()
                     .scale(xScale)
@@ -47,14 +53,17 @@ d3.csv('data/full_data_all.csv', function(data) {
                     .ticks(10)
                     .orient("left");
 
+                var y_text = graph_text(j);
+
                 svg.append("g")
                     .attr("class", "x axis")
                     .attr("transform", "translate("+ margin.left + "," + (height + margin.top) + ")")
                     .call(xAxis);
 
                 svg.append("text")
-                    .attr("x", width / 1.5)
+                    .attr("x", width/ 1.3)
                     .attr("y", height + margin.bottom)
+                    .attr("dy", ".71em")
                     .style("text-anchor", "end")
                     .text("Date");
 
@@ -69,7 +78,16 @@ d3.csv('data/full_data_all.csv', function(data) {
                     .attr("y", 6)
                     .attr("dy", ".71em")
                     .style("text-anchor", "end")
-                // .text(y_text);
+                    .text(y_text);
+
+                svg.append("g")
+                    .append("path")
+                    .attr("d", graph_line(filtered))
+                    .attr("id", "capacity")
+                    .attr("fill", "none")
+                    .attr("stroke", line_color(j))
+                    .attr("stroke-width", 2)
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
             }
 
             build_graph();
@@ -94,3 +112,22 @@ function graph_type(graph_num) {
     }
 }
 
+function graph_text(graph_num) {
+    if(graph_num === 0) {
+        return 'Fires';
+    } else if(graph_num == 1) {
+        return 'Avg. Temp (F)';
+    } else {
+        return 'Rainfall (inches)';
+    }
+}
+
+function line_color(graph_num) {
+    if(graph_num === 0) {
+        return 'firebrick';
+    } else if(graph_num == 1) {
+        return 'green';
+    } else {
+        return 'orange';
+    }
+}
