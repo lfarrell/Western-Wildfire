@@ -1,5 +1,6 @@
 <?php
 //date_default_timezone_set('America/New_York');
+ini_set('memory_limit','-1');
 include 'simple_html_dom.php';
 
 $site_base = 'http://inciweb.nwcg.gov';
