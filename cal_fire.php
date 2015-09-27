@@ -1,4 +1,5 @@
 <?php
+ini_set('memory_limit','-1');
 include 'simple_html_dom.php';
 
 $base_link = "http://cdfdata.fire.ca.gov/incidents/incidents_current";
