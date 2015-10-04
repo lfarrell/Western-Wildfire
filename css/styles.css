@@ -64,3 +64,13 @@ text {
     fill: white;
     stroke:white;
 }
+
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.focus circle {
+    fill: none;
+    stroke: white;
+}
