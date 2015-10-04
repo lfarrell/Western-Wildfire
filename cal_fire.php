@@ -1,4 +1,5 @@
 <?php
+ini_set('memory_limit','-1');
 include 'simple_html_dom.php';
 
 $base_link = "http://cdfdata.fire.ca.gov/incidents/incidents_current";
@@ -7,17 +8,17 @@ $map_base = "http://cdfdata.fire.ca.gov/incidents/incidents_details_maps?inciden
 $fh = fopen('cal_fire.csv', 'wb');
 fputcsv($fh, array('name','size', 'lat', 'lng', 'cause', 'date', 'fuels', 'personnel', 'contained', 'location', 'events', 'weather', 'link'));
 
-$data = array();
-// pre-populate the rest of info as some fields might be missing
-for($i=0; $i<12; $i++) {
-    $data[$i] = '';
-}
-
 for($i=0; $i<29; $i++) {
     $html = file_get_html($base_link_next . $i);
     $fire_links = $html->find('.header_td a');
 
     foreach($fire_links as $fire_link) {
+        $data = array();
+        // pre-populate the rest of info as some fields might be missing
+        for($i=0; $i<12; $i++) {
+            $data[$i] = '';
+        }
+
         $full_record = 'http://cdfdata.fire.ca.gov' . $fire_link->href;
         $incident_id = clean(preg_split('/=/', $fire_link->href)[1]);
         $fire = file_get_html($full_record);
