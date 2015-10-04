@@ -2,7 +2,7 @@
  * Load historic graphs
  */
 d3.csv('data/full_data_all.csv', function(data) {
-    var margin = {top: 20, right: 25, left: 70, bottom: 50},
+    var margin = {top: 20, right: 100, left: 70, bottom: 50},
         height = 375 - margin.top - margin.bottom,
         svg_width = document.getElementById("fires"),
         format = d3.time.format("%Y").parse;
@@ -32,7 +32,7 @@ d3.csv('data/full_data_all.csv', function(data) {
 
     build_graph();
 
-    function graph_type(graph, field, state, width, j) { console.log(field)
+    function graph_type(graph, field, state, width, j) {
         graph.attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append('g');
@@ -40,6 +40,8 @@ d3.csv('data/full_data_all.csv', function(data) {
         var filtered = data.filter(function(d) {
             return d.state == state.toUpperCase();
         });
+
+        var info_box = d3.select('#results ul');
 
         var xScale = d3.time.scale().range([0, width]);
         xScale.domain(d3.extent(filtered, function(d) {
@@ -123,7 +125,10 @@ d3.csv('data/full_data_all.csv', function(data) {
             .attr("width", width)
             .attr("height", height)
             .on("mouseover", function() { focus.style("display", null); })
-            .on("mouseout", function() { focus.style("display", "none"); })
+            .on("mouseout", function() {
+                focus.style("display", "none");
+                info_box.html('');
+            })
             .on("mousemove",  mousemove)
             .attr("transform", "translate(" + margin.left+ "," + margin.top + ")");
 
@@ -144,7 +149,7 @@ d3.csv('data/full_data_all.csv', function(data) {
             d3.select("#fires text.y0").attr("transform", fires_transform)
                 .tspans([
                     "Year: " + d.string_year,
-                    "Fires: " + d.fires
+                    "Fires: " + numFormat(d.fires)
                 ]);
 
             d3.select("#precip circle.y0").attr("transform", precip_transform);
@@ -161,7 +166,12 @@ d3.csv('data/full_data_all.csv', function(data) {
                     "Avg. Temp: " + d.temp
                 ]);
 
-            d3.select('#wy').html("Year: " + d.string_year + "<br/>Fires: " +d.fires + "<br/>Avg. Temp: " + d.temp + "<br/>Rainfall Total: " + d.precip).style("text-align", "center");
+            info_box.html(
+                "<li><strong>Year:</strong> " + d.string_year + "</li>" +
+                "<li><strong>Fires:</strong> " + numFormat(d.fires) + "</li>" +
+                "<li><strong>Avg. Temp:</strong> " + d.temp + "</li>" +
+                "<li><strong>Rainfall Total (Inches):</strong> " + d.precip + "</li>"
+            );
         }
     }
 

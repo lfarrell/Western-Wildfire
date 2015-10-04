@@ -63,6 +63,7 @@ h2, h3, h4 {
 text {
     fill: white;
     stroke:white;
+    font-size: 12px;
 }
 
 .overlay {
@@ -73,4 +74,14 @@ text {
 .focus circle {
     fill: none;
     stroke: white;
+}
+
+#results {
+    min-height: 30px;
+    text-align: center;
+}
+
+#results ul li {
+    display: inline;
+    margin-right: 10px;
 }
