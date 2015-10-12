@@ -28,25 +28,26 @@
     </div>
     <div class="col-md-12"><h2>Historic Wildfires 2002-2014</h2></div>
     <div id="fire-options" class="row">
-            <div class="col-md-offset-1 col-md-4 btn-group" role="group" aria-label="Fire Options">
-                <button id="num" type="button" class="btn btn-default"># of Fires</button>
-                <button id="acres" type="button" class="btn btn-default">Acres Burned</button>
-                <button id="avg" type="button" class="btn btn-default">Avg. Acres Burned</button>
-            </div>
-            <div class="col-md-4 btn-group" role="group" aria-label="Temperature Options">
-                <button id="temp" type="button" class="btn btn-default">Avg. Temperature</button>
-                <button id="temp_anom" type="button" class="btn btn-default">Temp Anomaly</button>
-            </div>
-            <div class="col-md-3 btn-group" role="group" aria-label="Precipitation Options">
-                <button id="rain" type="button" class="btn btn-default">Rainfall</button>
-                <button id="rain_anom" type="button" class="btn btn-default">Rainfall Anomaly</button>
-            </div>
+        <div class="col-md-offset-1 col-md-4 btn-group" role="group" aria-label="Fire Options">
+            <button id="fires-fires" type="button" class="btn btn-default"># of Fires</button>
+            <button id="fires-acres" type="button" class="btn btn-default">Acres Burned</button>
+            <button id="fires-avg_size" type="button" class="btn btn-default">Avg. Acres Burned</button>
+        </div>
+
+        <div class="col-md-3 btn-group" role="group" aria-label="Precipitation Options">
+            <button id="precip-precip" type="button" class="btn btn-default">Rainfall</button>
+            <button id="precip-precip_anomoly" type="button" class="btn btn-default">Rainfall Anomaly</button>
+        </div>
+        <div class="col-md-4 btn-group" role="group" aria-label="Temperature Options">
+            <button id="temp-temp" type="button" class="btn btn-default">Avg. Temperature</button>
+            <button id="temp-temp_anomoly" type="button" class="btn btn-default">Temp Anomaly</button>
+        </div>
     </div>
     <div class="row">
         <h3 id="state_name">California</h3>
         <div id="results"><ul></ul></div>
         <div id="fires" class="fire col-md-4"><h4>Fires</h4></div>
-        <div id="precip" class="precip col-md-4"><h4>Precipitation</h4></div>
+        <div id="rain" class="precip col-md-4"><h4>Precipitation</h4></div>
         <div id="temperature" class="temp col-md-4"><h4>Temperature</h4></div>
     </div>
 </div>

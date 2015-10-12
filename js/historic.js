@@ -19,14 +19,14 @@ d3.csv('data/full_data_all.csv', function(data) {
     });
 
     var fires = d3.select('#fires').append('svg');
-    var precip = d3.select('#precip').append('svg');
+    var rain = d3.select('#rain').append('svg');
     var temp = d3.select('#temperature').append('svg');
 
     function build_graph() {
         var width = svg_width.clientWidth - margin.left - margin.right;
 
-        graph_type(fires, 'acres', 'ca', width, 0);
-        graph_type(precip, 'precip', 'ca', width, 2);
+        graph_type(fires, 'fires', 'ca', width, 0);
+        graph_type(rain, 'precip', 'ca', width, 2);
         graph_type(temp, 'temp', 'ca', width, 1);
     }
 
@@ -101,7 +101,7 @@ d3.csv('data/full_data_all.csv', function(data) {
         graph.append("g")
             .append("path")
             .attr("d", graph_line(filtered))
-            .attr("id", "capacity")
+            .attr("id", field + "_1")
             .attr("fill", "none")
             .attr("stroke", line_color(j))
             .attr("stroke-width", 2)
@@ -141,7 +141,7 @@ d3.csv('data/full_data_all.csv', function(data) {
             if(d1 === undefined) d1 = Infinity;
             var d = x0 - d0.year > d1.year - x0 ? d1 : d0;
 
-            var fires_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d.acres) + margin.top) + ")";
+            var fires_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d.fires) + margin.top) + ")";
             var precip_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d.precip) + margin.top) + ")";
             var temp_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d.temp) + margin.top) + ")";
 
@@ -152,8 +152,8 @@ d3.csv('data/full_data_all.csv', function(data) {
                     "Fires: " + numFormat(d.fires)
                 ]);
 
-            d3.select("#precip circle.y0").attr("transform", precip_transform);
-            d3.select("#precip text.y0").attr("transform", precip_transform)
+            d3.select("#rain circle.y0").attr("transform", precip_transform);
+            d3.select("#rain text.y0").attr("transform", precip_transform)
                 .tspans([
                     "Year: " + d.string_year,
                     "Rainfall: " + d.precip
@@ -173,17 +173,40 @@ d3.csv('data/full_data_all.csv', function(data) {
                 "<li><strong>Rainfall Total (Inches):</strong> " + d.precip + "</li>"
             );
         }
-    }
 
-        window.addEventListener("resize", build_graph);
+        // Update Charts
+        function chart_update(datz, graph, selected_field) {
+           var graph_linez =  d3.svg.line()
+                .x(function(d) { return xScale(d.year); })
+                .y(function(d) { console.log(d[selected_field]); return yScale(d[selected_field]); });
+            var chart;
+
+            yScale.domain([d3.max(datz, function(d) { return d[selected_field]; }), 0]);
+
+            if(graph === 'fires') {
+                chart = '#fires'
+            } else if(graph === 'precip') {
+                chart = '#rain';
+            } else {
+                chart = "#temperature";
+            }
+
+            d3.select(chart + " g.y").transition().duration(1000).ease("sin-in-out").call(yAxis);
+            d3.select(chart + "_1").transition().duration(1000).ease("sin-in-out").attr("d", graph_linez(datz));
+        }
 
         d3.select('#fire-options').on('click', function() {
-            console.log("the thing that was actually clicked:", d3.event.target.id)
-        });
+            var field = d3.event.target.id;
 
-       /* d3.select('rect').on('mousemove', function() {
-            console.log("the thing that was actually clicked:", d3.event.target.id)
-        }); */
+            var which_graph = field.split('-');
+            var graph_name = which_graph[0];
+            var graph_field = which_graph[1];
+
+            chart_update(filtered, graph_name, graph_field);
+        });
+    }
+
+    window.addEventListener("resize", build_graph);
 });
 
 function graph_text(graph_num) {
@@ -203,5 +226,37 @@ function line_color(graph_num) {
         return 'green';
     } else {
         return 'orange';
+    }
+}
+
+function selected_field() {
+    var fire_field, rain_field, temp_field;
+
+    if(graph_name == 'fires') {
+        if(graph_field == 'fires') {
+            fire_field = 'fires'
+        } else if (graph_field == 'acres') {
+            fire_field = 'acres'
+        } else {
+            fire_field == 'avg_size'
+        }
+
+        localStorage.setItem("fire_field", fire_field);
+    } else if(graph_field == 'precip') {
+        if(graph_field == 'fires') {
+            rain_field = 'precip';
+        } else {
+            rain_field = 'precip__anomoly';
+        }
+
+        localStorage.setItem('rain_field', rain_field);
+    } else {
+        if(graph_field == 'temp') {
+            temp_field = 'temp';
+        } else {
+            temp_field = 'temp__anomoly';
+        }
+
+        localStorage.setItem('temp_field', temp_field);
     }
 }
