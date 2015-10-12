@@ -13,7 +13,7 @@ d3.csv('data/full_data_all.csv', function(data) {
         d.year = format(d.year);
         d.acres = +d.acres;
         d.precip = +d.precip;
-        d.precip__anomoly = +d.precip__anomoly;
+        d.precip_anomoly = +d.precip_anomoly;
         d.temp = +d.temp;
         d.temp_anomoly = +d.temp_anomoly;
     });
@@ -28,6 +28,10 @@ d3.csv('data/full_data_all.csv', function(data) {
         graph_type(fires, 'fires', 'ca', width, 0);
         graph_type(rain, 'precip', 'ca', width, 2);
         graph_type(temp, 'temp', 'ca', width, 1);
+
+        localStorage.setItem('fire_field', 'fires');
+        localStorage.setItem('rain_field', 'precip');
+        localStorage.setItem('temp_field', 'temp');
     }
 
     build_graph();
@@ -133,6 +137,10 @@ d3.csv('data/full_data_all.csv', function(data) {
             .attr("transform", "translate(" + margin.left+ "," + margin.top + ")");
 
         function mousemove() {
+            var fire_field = localStorage.getItem('fire_field'),
+                rain_field = localStorage.getItem('rain_field'),
+                temp_field = localStorage.getItem('temp_field');
+
             var x0 = xScale.invert(d3.mouse(this)[0]),
                 t = bisectDate(filtered, x0, 1),
                 d0 = filtered[t - 1],
@@ -141,36 +149,36 @@ d3.csv('data/full_data_all.csv', function(data) {
             if(d1 === undefined) d1 = Infinity;
             var d = x0 - d0.year > d1.year - x0 ? d1 : d0;
 
-            var fires_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d.fires) + margin.top) + ")";
-            var precip_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d.precip) + margin.top) + ")";
-            var temp_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d.temp) + margin.top) + ")";
+            var fires_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d[fire_field]) + margin.top) + ")";
+            var precip_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d[rain_field]) + margin.top) + ")";
+            var temp_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d[temp_field]) + margin.top) + ")";
 
             d3.select("#fires circle.y0").attr("transform", fires_transform);
             d3.select("#fires text.y0").attr("transform", fires_transform)
                 .tspans([
                     "Year: " + d.string_year,
-                    "Fires: " + numFormat(d.fires)
+                    "Fires: " + numFormat(d[fire_field])
                 ]);
 
             d3.select("#rain circle.y0").attr("transform", precip_transform);
             d3.select("#rain text.y0").attr("transform", precip_transform)
                 .tspans([
                     "Year: " + d.string_year,
-                    "Rainfall: " + d.precip
+                    "Rainfall: " + d[rain_field]
                 ]);
 
             d3.select("#temperature circle.y0").attr("transform", temp_transform);
             d3.select("#temperature text.y0").attr("transform", temp_transform)
                 .tspans([
                     "Year: " + d.string_year,
-                    "Avg. Temp: " + d.temp
+                    "Avg. Temp: " + d[temp_field]
                 ]);
 
             info_box.html(
                 "<li><strong>Year:</strong> " + d.string_year + "</li>" +
-                "<li><strong>Fires:</strong> " + numFormat(d.fires) + "</li>" +
-                "<li><strong>Avg. Temp:</strong> " + d.temp + "</li>" +
-                "<li><strong>Rainfall Total (Inches):</strong> " + d.precip + "</li>"
+                "<li><strong>Fires:</strong> " + numFormat(d[fire_field]) + "</li>" +
+                "<li><strong>Avg. Temp:</strong> " + d[temp_field] + "</li>" +
+                "<li><strong>Rainfall Total (Inches):</strong> " + d[rain_field] + "</li>"
             );
         }
 
@@ -178,10 +186,16 @@ d3.csv('data/full_data_all.csv', function(data) {
         function chart_update(datz, graph, selected_field) {
            var graph_linez =  d3.svg.line()
                 .x(function(d) { return xScale(d.year); })
-                .y(function(d) { console.log(d[selected_field]); return yScale(d[selected_field]); });
+                .y(function(d) { return yScale(d[selected_field]); });
             var chart;
 
-            yScale.domain([d3.max(datz, function(d) { return d[selected_field]; }), 0]);
+            if(graph == 'fires' || !/anomoly/.test(selected_field)) {
+                yScale.domain([d3.max(datz, function(d) { return d[selected_field]; }), 0]);
+            } else {
+                yScale.domain(d3.extent(datz, function(d) { return d[selected_field]; }));
+                console.log(d3.extent(datz, function(d) { return d[selected_field]; }))
+            }
+
 
             if(graph === 'fires') {
                 chart = '#fires'
@@ -202,6 +216,7 @@ d3.csv('data/full_data_all.csv', function(data) {
             var graph_name = which_graph[0];
             var graph_field = which_graph[1];
 
+            selected_field(graph_field);
             chart_update(filtered, graph_name, graph_field);
         });
     }
@@ -229,10 +244,10 @@ function line_color(graph_num) {
     }
 }
 
-function selected_field() {
+function selected_field(graph_field) {
     var fire_field, rain_field, temp_field;
 
-    if(graph_name == 'fires') {
+    if(graph_field == 'fires') {
         if(graph_field == 'fires') {
             fire_field = 'fires'
         } else if (graph_field == 'acres') {
