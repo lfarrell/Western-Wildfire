@@ -55,8 +55,6 @@ d3.csv('data/full_data_all.csv', function(data) {
         var yScale = d3.scale.linear().range([0, height]);
         yScale.domain([d3.max(filtered, function(d) { return d[field]; }), 0]);
 
-        var bisectDate = d3.bisector(function(d) { return d.year; }).right;
-
         var graph_line =  d3.svg.line()
             .x(function(d) { return xScale(d.year); })
             .y(function(d) { return yScale(d[field]); });
@@ -99,9 +97,6 @@ d3.csv('data/full_data_all.csv', function(data) {
             .style("text-anchor", "end")
             .text(y_text);
 
-        /**
-         * Show values on mouseover
-         */
         graph.append("g")
             .append("path")
             .attr("d", graph_line(filtered))
@@ -111,32 +106,33 @@ d3.csv('data/full_data_all.csv', function(data) {
             .attr("stroke-width", 2)
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        var focus = graph.append("g")
-            .attr("class", "focus")
-            .style("display", "none");
+        var circles = graph.selectAll("circle")
+            .data(filtered);
 
-        focus.append("circle")
-            .attr("class", "y0")
-            .attr("r", 4.5);
+        circles.enter()
+            .append('circle')
+            .attr('class', 'line-circles')
+            .attr('r', 4)
+            .attr('cx', function(d) { return xScale(d.year); })
+            .attr('cy', function(d) { return yScale(d[field]); })
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .style('fill', line_color(j))
+            .on('click', function(d) {
+                var fire_field = localStorage.getItem('fire_field'),
+                    rain_field = localStorage.getItem('rain_field'),
+                    temp_field = localStorage.getItem('temp_field');
 
-        focus.append("text")
-            .attr("class", "y0")
-            .attr("x", 9)
-            .attr("dy", ".35em");
+                info_box.html(
+                    "<li><strong>Year:</strong> " + d.string_year + "</li>" +
+                    "<li><strong>Fires:</strong> " + numFormat(d[fire_field]) + "</li>" +
+                    "<li><strong>Avg. Temp:</strong> " + d[temp_field] + "</li>" +
+                    "<li><strong>Rainfall Total (Inches):</strong> " + d[rain_field] + "</li>"
+                );
+            });
 
-        graph.append("rect")
-            .attr("class", "overlay")
-            .attr("width", width)
-            .attr("height", height)
-            .on("mouseover", function() { focus.style("display", null); })
-            .on("mouseout", function() {
-                focus.style("display", "none");
-                info_box.html('');
-            })
-            .on("mousemove",  mousemove)
-            .attr("transform", "translate(" + margin.left+ "," + margin.top + ")");
+        circles.exit().remove();
 
-        function mousemove() {
+     /*   function mousemove() {
             var fire_field = localStorage.getItem('fire_field'),
                 rain_field = localStorage.getItem('rain_field'),
                 temp_field = localStorage.getItem('temp_field');
@@ -180,22 +176,21 @@ d3.csv('data/full_data_all.csv', function(data) {
                 "<li><strong>Avg. Temp:</strong> " + d[temp_field] + "</li>" +
                 "<li><strong>Rainfall Total (Inches):</strong> " + d[rain_field] + "</li>"
             );
-        }
+        } */
 
         // Update Charts
         function chart_update(datz, graph, selected_field) {
-           var graph_linez =  d3.svg.line()
-                .x(function(d) { return xScale(d.year); })
-                .y(function(d) { return yScale(d[selected_field]); });
             var chart;
 
             if(graph == 'fires' || !/anomoly/.test(selected_field)) {
                 yScale.domain([d3.max(datz, function(d) { return d[selected_field]; }), 0]);
             } else {
-                yScale.domain(d3.extent(datz, function(d) { return d[selected_field]; }));
-                console.log(d3.extent(datz, function(d) { return d[selected_field]; }))
+                yScale.domain(d3.extent(datz, function(d) { return d[selected_field]; }).reverse());
             }
 
+            var graph_linez =  d3.svg.line()
+                .x(function(d) { return xScale(d.year); })
+                .y(function(d) { return yScale(d[selected_field]); });
 
             if(graph === 'fires') {
                 chart = '#fires'
@@ -205,8 +200,15 @@ d3.csv('data/full_data_all.csv', function(data) {
                 chart = "#temperature";
             }
 
+            console.log(chart);
+
             d3.select(chart + " g.y").transition().duration(1000).ease("sin-in-out").call(yAxis);
-            d3.select(chart + "_1").transition().duration(1000).ease("sin-in-out").attr("d", graph_linez(datz));
+            d3.select('#' + graph + "_1").transition().duration(1000).ease("sin-in-out").attr("d", graph_linez(datz));
+            d3.selectAll(chart + " circle").transition()
+                .duration(1000)
+                .ease("sin-in-out")
+                .attr('cy', function(d) { return yScale(d[selected_field]); })
+
         }
 
         d3.select('#fire-options').on('click', function() {
@@ -216,7 +218,7 @@ d3.csv('data/full_data_all.csv', function(data) {
             var graph_name = which_graph[0];
             var graph_field = which_graph[1];
 
-            selected_field(graph_field);
+            selected_field(graph_name, graph_field);
             chart_update(filtered, graph_name, graph_field);
         });
     }
@@ -244,34 +246,12 @@ function line_color(graph_num) {
     }
 }
 
-function selected_field(graph_field) {
-    var fire_field, rain_field, temp_field;
-
-    if(graph_field == 'fires') {
-        if(graph_field == 'fires') {
-            fire_field = 'fires'
-        } else if (graph_field == 'acres') {
-            fire_field = 'acres'
-        } else {
-            fire_field == 'avg_size'
-        }
-
-        localStorage.setItem("fire_field", fire_field);
-    } else if(graph_field == 'precip') {
-        if(graph_field == 'fires') {
-            rain_field = 'precip';
-        } else {
-            rain_field = 'precip__anomoly';
-        }
-
-        localStorage.setItem('rain_field', rain_field);
+function selected_field(graph_name, graph_field) {
+    if(graph_name == 'fires') {
+        localStorage.setItem('fire_field', graph_field);
+    } else if(graph_name == 'precip') {
+        localStorage.setItem('rain_field', graph_field);
     } else {
-        if(graph_field == 'temp') {
-            temp_field = 'temp';
-        } else {
-            temp_field = 'temp__anomoly';
-        }
-
-        localStorage.setItem('temp_field', temp_field);
+        localStorage.setItem('temp_field', graph_field);
     }
 }
