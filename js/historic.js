@@ -17,6 +17,16 @@ d3.csv('data/full_data_all.csv', function(data) {
         d.temp = +d.temp;
         d.temp_anomoly = +d.temp_anomoly;
     });
+    
+    var y_texts = [
+        'Fires',
+        'Avg. Temp (F)',
+        'Rainfall (inches)',
+        'Total Acres Burned',
+        'Avg. Acres Burned',
+        'Temp Anomaly (F)',
+        'Rainfall Anomaly (inches)'
+    ];
 
     var fires = d3.select('#fires').append('svg');
     var rain = d3.select('#rain').append('svg');
@@ -32,6 +42,9 @@ d3.csv('data/full_data_all.csv', function(data) {
         localStorage.setItem('fire_field', 'fires');
         localStorage.setItem('rain_field', 'precip');
         localStorage.setItem('temp_field', 'temp');
+        localStorage.setItem('fire_text', 0);
+        localStorage.setItem('rain_text', 2);
+        localStorage.setItem('temp_text', 1);
     }
 
     build_graph();
@@ -70,8 +83,6 @@ d3.csv('data/full_data_all.csv', function(data) {
             .ticks(10)
             .orient("left");
 
-        var y_text = graph_text(j);
-
         graph.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate("+ margin.left + "," + (height + margin.top) + ")")
@@ -94,8 +105,9 @@ d3.csv('data/full_data_all.csv', function(data) {
             .attr("x", -height/2)
             .attr("y", 6)
             .attr("dy", ".71em")
+            .attr("class", "y_text_" + j)
             .style("text-anchor", "end")
-            .text(y_text);
+            .text(y_texts[j]);
 
         graph.append("g")
             .append("path")
@@ -120,87 +132,49 @@ d3.csv('data/full_data_all.csv', function(data) {
             .on('click', function(d) {
                 var fire_field = localStorage.getItem('fire_field'),
                     rain_field = localStorage.getItem('rain_field'),
-                    temp_field = localStorage.getItem('temp_field');
+                    temp_field = localStorage.getItem('temp_field'),
+                    fire_text = localStorage.getItem('fire_text'),
+                    rain_text = localStorage.getItem('rain_text'),
+                    temp_text = localStorage.getItem('temp_text');
 
                 info_box.html(
                     "<li><strong>Year:</strong> " + d.string_year + "</li>" +
-                    "<li><strong>Fires:</strong> " + numFormat(d[fire_field]) + "</li>" +
-                    "<li><strong>Avg. Temp:</strong> " + d[temp_field] + "</li>" +
-                    "<li><strong>Rainfall Total (Inches):</strong> " + d[rain_field] + "</li>"
+                    "<li><strong>" + y_texts[fire_text] + ":</strong> " + numFormat(d[fire_field]) + "</li>" +
+                    "<li><strong>" + y_texts[rain_text] + ":</strong> " + d[rain_field] + "</li>" +
+                    "<li><strong>" + y_texts[temp_text] + ":</strong> " + d[temp_field] + "</li>"
                 );
             });
 
         circles.exit().remove();
 
-     /*   function mousemove() {
-            var fire_field = localStorage.getItem('fire_field'),
-                rain_field = localStorage.getItem('rain_field'),
-                temp_field = localStorage.getItem('temp_field');
-
-            var x0 = xScale.invert(d3.mouse(this)[0]),
-                t = bisectDate(filtered, x0, 1),
-                d0 = filtered[t - 1],
-                d1 = filtered[t];
-
-            if(d1 === undefined) d1 = Infinity;
-            var d = x0 - d0.year > d1.year - x0 ? d1 : d0;
-
-            var fires_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d[fire_field]) + margin.top) + ")";
-            var precip_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d[rain_field]) + margin.top) + ")";
-            var temp_transform = "translate(" + (xScale(d.year) + margin.left) + "," + (yScale(d[temp_field]) + margin.top) + ")";
-
-            d3.select("#fires circle.y0").attr("transform", fires_transform);
-            d3.select("#fires text.y0").attr("transform", fires_transform)
-                .tspans([
-                    "Year: " + d.string_year,
-                    "Fires: " + numFormat(d[fire_field])
-                ]);
-
-            d3.select("#rain circle.y0").attr("transform", precip_transform);
-            d3.select("#rain text.y0").attr("transform", precip_transform)
-                .tspans([
-                    "Year: " + d.string_year,
-                    "Rainfall: " + d[rain_field]
-                ]);
-
-            d3.select("#temperature circle.y0").attr("transform", temp_transform);
-            d3.select("#temperature text.y0").attr("transform", temp_transform)
-                .tspans([
-                    "Year: " + d.string_year,
-                    "Avg. Temp: " + d[temp_field]
-                ]);
-
-            info_box.html(
-                "<li><strong>Year:</strong> " + d.string_year + "</li>" +
-                "<li><strong>Fires:</strong> " + numFormat(d[fire_field]) + "</li>" +
-                "<li><strong>Avg. Temp:</strong> " + d[temp_field] + "</li>" +
-                "<li><strong>Rainfall Total (Inches):</strong> " + d[rain_field] + "</li>"
-            );
-        } */
-
         // Update Charts
-        function chart_update(datz, graph, selected_field) {
-            var chart;
-
-            if(graph == 'fires' || !/anomoly/.test(selected_field)) {
-                yScale.domain([d3.max(datz, function(d) { return d[selected_field]; }), 0]);
-            } else {
-                yScale.domain(d3.extent(datz, function(d) { return d[selected_field]; }).reverse());
-            }
-
+        function chart_update(datz, graph, selected_field, y_text) {
+            var chart, y_text_option;
             var graph_linez =  d3.svg.line()
                 .x(function(d) { return xScale(d.year); })
                 .y(function(d) { return yScale(d[selected_field]); });
 
+            yScale.domain([d3.max(datz, function(d) { return d[selected_field]; }), 0]);
+
             if(graph === 'fires') {
-                chart = '#fires'
+                chart = '#fires';
+                y_text_option = '.y_text_0';
+                localStorage.setItem('fire_text', y_text);
             } else if(graph === 'precip') {
                 chart = '#rain';
-            } else {
+                y_text_option = '.y_text_2';
+                localStorage.setItem('rain_text', y_text);
+            } else if(graph === 'temp') {
                 chart = "#temperature";
+                y_text_option = '.y_text_1';
+                localStorage.setItem('temp_text', y_text);
+            } else {
+                chart = ['#fires', '#rain', '#temperature'];
             }
 
-            console.log(chart);
+            if(y_text_option !== undefined) {
+                d3.selectAll(y_text_option).text(y_texts[y_text]);
+            }
 
             d3.select(chart + " g.y").transition().duration(1000).ease("sin-in-out").call(yAxis);
             d3.select('#' + graph + "_1").transition().duration(1000).ease("sin-in-out").attr("d", graph_linez(datz));
@@ -211,30 +185,47 @@ d3.csv('data/full_data_all.csv', function(data) {
 
         }
 
+        d3.select('#state_list').on('change', function() {
+            var state_list = {
+                AK: "Alaska",
+                AZ: "Arizona",
+                CA: "California",
+                CO: "Colorado",
+                ID: "Idaho",
+                MT: "Montana",
+                NV: "Nevada",
+                NM: "New Mexico",
+                WA: "Washington",
+                WY: "Wyoming"
+            };
+            var state = d3.select(this);
+            var selected_state = state.property("value");
+            var filtered = data.filter(function(d) {
+                return d.state == selected_state;
+            });
+
+         //   chart_update(filtered, 'all', );
+
+            d3.select('#state_name').text(state_list[selected_state]);
+            state.property('value', '');
+
+        });
+
         d3.select('#fire-options').on('click', function() {
             var field = d3.event.target.id;
 
             var which_graph = field.split('-');
             var graph_name = which_graph[0];
             var graph_field = which_graph[1];
+            var graph_text = which_graph[2];
 
             selected_field(graph_name, graph_field);
-            chart_update(filtered, graph_name, graph_field);
+            chart_update(filtered, graph_name, graph_field, graph_text);
         });
     }
 
     window.addEventListener("resize", build_graph);
 });
-
-function graph_text(graph_num) {
-    if(graph_num === 0) {
-        return 'Fires';
-    } else if(graph_num == 1) {
-        return 'Avg. Temp (F)';
-    } else {
-        return 'Rainfall (inches)';
-    }
-}
 
 function line_color(graph_num) {
     if(graph_num === 0) {
