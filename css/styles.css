@@ -54,5 +54,23 @@ h2, h4 {
 
 #link {
     margin-top: 25px;
-    font-size: 20px;
+}
+
+footer a, footer a:visited, footer a:hover {
+    color: orange;
+}
+
+footer ul {
+    text-align: center;
+}
+
+footer ul li {
+    display: inline;
+    margin-left: 25px;
+    font-size: 1.4em;
+}
+
+.subfooter {
+    margin-top: 50px;
+    margin-bottom: 25px;
 }
