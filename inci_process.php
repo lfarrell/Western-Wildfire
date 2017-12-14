@@ -3,7 +3,7 @@
 ini_set('memory_limit','-1');
 include 'simple_html_dom.php';
 
-$site_base = 'http://inciweb.nwcg.gov';
+$site_base = 'https://inciweb.nwcg.gov';
 $html = file_get_html($site_base);
 $fh = fopen('fires.csv', 'wb');
 fputcsv($fh, array('name','size', 'lat', 'lng', 'cause', 'date', 'fuels', 'personnel', 'contained', 'location', 'events', 'weather', 'link'));

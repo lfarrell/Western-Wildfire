@@ -1,7 +1,7 @@
 /**
  *  Load  map
  */
-queue().defer(d3.csv,'data/fires.csv')
+queue().defer(d3.csv,'fires.csv')
     .defer(d3.csv,'data/cal_fire.csv')
     .await(function(error, inci_web, cal_fire) {
 
@@ -28,7 +28,7 @@ queue().defer(d3.csv,'data/fires.csv')
      * Process data for adding circles
      */
     data.sort(function(a,b) {
-        return +a.size - +b.size;
+        return +b.size - +a.size;
     });
 
     data.forEach(function(d){
@@ -55,8 +55,8 @@ queue().defer(d3.csv,'data/fires.csv')
      */
     var firesOverlay = L.d3SvgOverlay(function(sel,proj){
         var circle_size = d3.scale.sqrt().domain(d3.extent(data, function(d) {
-            return d.size;
-        })).range([3, 25]).clamp(true);
+            return +d.size;
+        })).range([2, 15]).clamp(true);
 
         var fire_map = sel.selectAll('circle').data(data);
 
