@@ -6,7 +6,7 @@ body {
 
 #map {
     color: black;
-    height: 550px
+    height: 100vh
 }
 
 #sub-map {
@@ -19,7 +19,7 @@ body {
     border-left: 2px solid lightgray;
     border-bottom: 2px solid lightgray;
     color: black;
-    height: 550px;
+    height: 100vh
 }
 
 circle {

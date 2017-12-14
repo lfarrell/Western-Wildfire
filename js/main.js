@@ -4,7 +4,7 @@
 queue().defer(d3.csv,'data/fires.csv')
     .defer(d3.csv,'data/cal_fire.csv')
     .await(function(error, inci_web, cal_fire) {
-//d3.csv('data/fires.csv', function(data) {
+
     var data = inci_web.concat(cal_fire);
     var screen_height = document.documentElement.clientHeight;
 
@@ -28,7 +28,7 @@ queue().defer(d3.csv,'data/fires.csv')
      * Process data for adding circles
      */
     data.sort(function(a,b) {
-        return b.size - a.size;
+        return +a.size - +b.size;
     });
 
     data.forEach(function(d){
@@ -54,9 +54,9 @@ queue().defer(d3.csv,'data/fires.csv')
      * Show all markers on main map
      */
     var firesOverlay = L.d3SvgOverlay(function(sel,proj){
-        var circle_size = d3.scale.linear().domain(d3.extent(data, function(d) {
+        var circle_size = d3.scale.sqrt().domain(d3.extent(data, function(d) {
             return d.size;
-        })).range([3, 15]).clamp(true);
+        })).range([3, 25]).clamp(true);
 
         var fire_map = sel.selectAll('circle').data(data);
 

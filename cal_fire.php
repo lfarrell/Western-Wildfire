@@ -2,25 +2,31 @@
 ini_set('memory_limit','-1');
 include 'simple_html_dom.php';
 
-$base_link = "http://cdfdata.fire.ca.gov/incidents/incidents_current";
-$base_link_next = "http://cdfdata.fire.ca.gov/incidents/incidents_current?pc=50&cp=";
-$map_base = "http://cdfdata.fire.ca.gov/incidents/incidents_details_maps?incident_id=";
+$base_link = "http://www.fire.ca.gov/incidents/incidents_current";
+$base_link_next = "http://www.fire.ca.gov/incidents/incidents_current?pc=50&cp=";
+$map_base = "http://www.fire.ca.gov/incidents/incidents_details_maps?incident_id=";
 $fh = fopen('cal_fire.csv', 'wb');
 fputcsv($fh, array('name','size', 'lat', 'lng', 'cause', 'date', 'fuels', 'personnel', 'contained', 'location', 'events', 'weather', 'link'));
 
 for($i=0; $i<29; $i++) {
-    $html = file_get_html($base_link_next . $i);
-    $fire_links = $html->find('.header_td a');
+    $rss = simplexml_load_file("http://www.fire.ca.gov/rss/rss.xml");
+    $fire_links = array();
+
+    foreach ($rss->channel->item as $item) {
+        $fire_links[] = $item->link;
+    }
 
     foreach($fire_links as $fire_link) {
         $data = array();
+        $exit = false;
         // pre-populate the rest of info as some fields might be missing
         for($i=0; $i<12; $i++) {
             $data[$i] = '';
         }
 
-        $full_record = 'http://cdfdata.fire.ca.gov' . $fire_link->href;
-        $incident_id = clean(preg_split('/=/', $fire_link->href)[1]);
+        $full_record = $fire_link;
+        $incident_id = clean(preg_split('/=/', $fire_link)[1]);
+        echo $incident_id . "\n";
         $fire = file_get_html($full_record);
         $fire_title = $fire->find('h3.incident_h3');
         $fire_name = clean($fire_title[0]->plaintext);
@@ -79,6 +85,10 @@ for($i=0; $i<29; $i++) {
                     $fields = preg_split('/-/', $vals);
                     $acres = str_replace('acres', '', $fields[0]);
 
+                    if(preg_match('/CAL\sFIRE/', $acres)) {
+                        $exit = true;
+                    }
+
                     $fire_size = clean($acres);
                     $data[1] = clean_num($fire_size);
                     $contained = preg_split('/\s+/', clean($fields[1]))[0];
@@ -130,7 +140,9 @@ for($i=0; $i<29; $i++) {
             }
         }
 
-        if(!isset($data[13])) {
+        if($exit) {
+            continue;
+        }elseif(!isset($data[13])) {
             $data[12] = $full_record;
             fputcsv($fh, $data);
             echo $fire_name . "\n";
