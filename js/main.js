@@ -2,7 +2,7 @@
  *  Load  map
  */
 queue().defer(d3.csv,'fires.csv')
-    .defer(d3.csv,'data/cal_fire.csv')
+    .defer(d3.csv,'cal_fire.csv')
     .await(function(error, inci_web, cal_fire) {
 
     var data = inci_web.concat(cal_fire);
