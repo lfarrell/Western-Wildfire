@@ -56,7 +56,7 @@ queue().defer(d3.csv,'fires.csv')
     var firesOverlay = L.d3SvgOverlay(function(sel,proj){
         var circle_size = d3.scale.sqrt().domain(d3.extent(data, function(d) {
             return +d.size;
-        })).range([2, 15]).clamp(true);
+        })).range([3, 15]).clamp(true);
 
         var fire_map = sel.selectAll('circle').data(data);
 

@@ -76,6 +76,8 @@ function process_page($html, $site_base, $fh = false) {
                 $fire_records = file_get_html($full_link);
                 $record = process_fire($fire_records, $data, $full_link);
 
+                if($record[8] == true || $record[8] == 'true') continue; // 100% contained
+
                 if($fh && $record[2] != '' && !in_array($full_name, $fire_names)) {
                   //  echo $record[0] . " added\n";
                     fputcsv($fh, $record);
@@ -139,6 +141,7 @@ function process_fire($html, $data, $full_link) {
             } elseif($field == 'Percent of Perimeter Contained') {
                 $contained = $info->find('td', 0);
                 $pct_contained = trim($contained->plaintext);
+                if($pct_contained == 100 || trim($pct_contained) == '') $pct_contained = true;
                 $data[8] = $pct_contained;
             } elseif($field == 'Location') {
                 $location = $info->find('td', 0);
